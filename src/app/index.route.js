@@ -18,7 +18,9 @@
         controllerAs: 'vm'
       })
        .when('/contact', {
-        templateUrl: 'app/components/contact/contact.html'
+        templateUrl: 'app/components/contact/contact.html',
+         controller: 'mqttProvider',
+         controllerAs: 'vm'
       })
       .otherwise({
         redirectTo: 'app/components/error/error.html'
