@@ -2,6 +2,7 @@
   "name": "myApp",
   "version": "0.0.0",
   "dependencies": {
+    "angular-chart.js": "^1.1.1",
     "mqtt": "^2.6.2",
     "ng-stomp": "^0.4.0"
   },

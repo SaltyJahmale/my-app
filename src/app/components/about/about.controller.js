@@ -3,118 +3,114 @@
 
   angular
     .module('myApp')
-    .controller('chartBarController', chartBarController);
+    .controller('ChartBarController', ChartBarController);
 
   /** @ngInject */
-  function chartBarController() {
+  function ChartBarController($scope, DataService) {
+
     var vm = this;
 
-    vm.myData = new Array();
-    vm.myData = [50];
+    /**
+     * add a data node
+     */
+    $scope.addNode = function () {
 
-    var client = mqtt.connect('tcp://0.0.0.0:9001');
+      vm.text = [];
 
-    console.log()
-    // client.publish('topic', 'hello')
-    console.log("about controller")
-
-    var topic = client.subscribe('topic')
-
-    client.on('message', function (topic, message) {
-      console.log(message.toString());
-      client.end();
-    });
-
-    function InitChart() {
-      var data = [{
-      //   "temp": "17",
-      //   "hours": "2000"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2001"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2002"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2003"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2004"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2005"
-      }];
-
-      var data2 = [{
-      //   "temp": "18",
-      //   "hours": "2014"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2015"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2016"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2018"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2019"
-      // }, {
-      //   "temp": "19",
-      //   "hours": "2020"
-      }];
-
-      var vis = d3.select("#visualisation"),
-        WIDTH = 1000,
-        HEIGHT = 500,
-        MARGINS = {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 50
-        },
-        xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2400]),
-        yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([1, 100]),
-        xAxis = d3.svg.axis()
-          .scale(xScale),
-        yAxis = d3.svg.axis()
-          .scale(yScale)
-          .orient("left");
-
-      vis.append("svg:g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
-        .call(xAxis);
-
-      vis.append("svg:g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
-        .call(yAxis);
-
-      var lineGen = d3.svg.line()
-        .x(function(d) {
-          return xScale(d.hours);
+      vm.dataInArray = DataService.query('http://localhost:8080/data/'+$scope.text).get(function () {
+        JSON.stringify(vm.dataInArray);
+        angular.forEach(vm.dataInArray, function (value) {
+          vm.text.push(value.inputData);
         })
-        .y(function(d) {
-          return yScale(d.temp);
-        })
-        .interpolate("basis");
+      });
 
-      vis.append('svg:path')
-        .attr('d', lineGen(data))
-        .attr('stroke', 'green')
-        .attr('stroke-width', 2)
-        .attr('fill', 'none');
+      addDataSet(myNewChart, $scope.text, vm.text);
 
-      vis.append('svg:path')
-        .attr('d', lineGen(data2))
-        .attr('stroke', 'blue')
-        .attr('stroke-width', 2)
-        .attr('fill', 'none');
+    };
+
+
+    /**
+     * stop and remove data
+     */
+    $scope.removeArrayData = function () {
+
+      dataChart.datasets.splice(0);
+      dataChart.datasets.forEach(function (dataset) {
+        dataset.data.splice(0);
+      });
+
+    };
+
+
+    /**
+     * Draw the graph
+     * @type {Element}
+     */
+    var canvas = document.getElementById("myChart");
+    var ctx = canvas.getContext("2d");
+
+    var dataChart = {
+      labels: ["", "", "", "", "", "", ""],
+      datasets: []
+    };
+
+
+    var settings = {
+      type: "line",
+      data: dataChart
+    };
+
+    var myNewChart = new Chart(ctx, settings);
+
+
+    /**
+     * add data to the graph
+     * @param chart
+     * @param label
+     */
+    function addData(chart, label) {
+      chart.data.labels.push(label);
+      chart.update();
+
     }
-    InitChart();
+
+    /**
+     * add dataset to the graph
+     * @param chart
+     * @param label
+     * @param data
+     */
+    function addDataSet(chart, label, data) {
+      chart.data.datasets.push({
+        label: label,
+        data: data
+      });
+
+      chart.update();
+    }
+
+    /**
+     * remove the first data from the graph
+     * @param chart
+     */
+    function removeData(chart) {
+      chart.data.labels.shift();
+      chart.data.datasets.forEach(function (dataset) {
+        dataset.data.shift();
+      });
+      chart.update();
+    }
+
+    /**
+     * Refresh rate graph
+     */
+    setInterval(function () {
+      var d = new Date();
+      // Add data to data set
+      addData(myNewChart, d.toLocaleTimeString());
+      // Remove the first point so we dont just add values forever
+      removeData(myNewChart);
+      }, 5000);
 
   }
 })();

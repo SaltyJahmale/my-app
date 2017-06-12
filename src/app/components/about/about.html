@@ -5,22 +5,54 @@
   </div>
 
   <div class="jumbotron text-center">
-    <h1> About page!</h1>
+    <h1> Graph page</h1>
 
   </div>
 
+  <chart value="myChart"></chart>
+
   <div class="panel panel-default">
-    <div class="panel-heading">Some data</div>
+    <div class="panel-heading">Add data to graph</div>
     <div class="panel-body">
-      <bars data="40,10,55,15,16,33,52,20"></bars>
+      <form ng-submit="addNode()">
+
+        <div class="row">
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <div class="form-group">
+              <input type="text" ng-model="text" name="text" placeholder="Topic"/>
+              <input type="submit" id="submit" value="submit"/>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 
   <div class="panel panel-default">
-    <div class="panel-heading">More data</div>
+    <div class="panel-heading">Remove/Stop data from graph</div>
     <div class="panel-body">
-      <svg id="visualisation" width="1000" height="500"></svg>
+        <form ng-submit="removeArrayData()" >
+          <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6">
+              <div class="form-group">
+                <input type="text" ng-model="name" name="name" placeholder=""/>
+                <input type="submit" id="delete" value="remove"/>
+              </div>
+            </div>
+          </div>
+        </form>
     </div>
+  </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Graph</div>
+    <div class="panel-body">
+
+      <canvas id="myChart" width="300" height="150"></canvas>
+
+    </div>
+
   </div>
 
 </div>
